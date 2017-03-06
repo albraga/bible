@@ -5,6 +5,10 @@ CHAPTER=$3
 PAGE="matthew_henry_"$BOOK"_"$CHAPTER".html"
 URL="http://www.sacred-texts.com/bib/cmt/mhcc/"$BOOK"00"$CHAPTER".htm"
 
+function download {
+	wget -O $PAGE $URL
+}
+
 function removehead {
 	HEAD=""$BOOK" "$CHAPTER":1"
 	sed -i '/'"$HEAD"'/,$!d' $PAGE
@@ -20,14 +24,24 @@ function removelines {
 	sed -i '/'"$RMLINE"'.*$/d' $PAGE
 }
 
+function removetags {
+		sed -i 's/<[^>]*>//g' $PAGE
+}
+
+function changeversetag {
+		 sed -i 's/ \([0-9]\):\(-\?[0-9]\)/\_\1\_\2/g' $PAGE
+}
+
 for argument in "$@"
 do
 case $argument in
-	download)
-		wget -O $PAGE $URL
+	process)
+		download
 		removehead
 		removetail
 		removelines
+		removetags
+		changeversetag
 	;;
 	becomeinitialcommit)
 		rm -rf .git
