@@ -1,9 +1,29 @@
 #!/bin/bash
 
 BOOK=$2
-CHAPTER=$3
-PAGE="matthew_henry_"$BOOK"_"$CHAPTER".json"
-URL="http://www.sacred-texts.com/bib/cmt/mhcc/"$BOOK"00"$CHAPTER".htm"
+CHAPTERS=$3
+
+function mkjson {
+  for (( i=1; i<=$CHAPTERS; i++ ))
+	do
+		CHAPTER=$i
+		PAGE="matthew_henry_"$BOOK"_"$CHAPTER".json"
+		URL="http://www.sacred-texts.com/bib/cmt/mhcc/"$BOOK"00"$CHAPTER".htm"
+		download
+		removehead
+		removetail
+		removelines
+		removetags
+		removedoublequotes
+		changeversetag
+		addquotes
+		paireverytwolines
+		addcolon
+		addcomma
+		addheadbrace
+		addtailbrace
+  done
+}
 
 function download {
 	wget -O $PAGE $URL
@@ -26,6 +46,10 @@ function removelines {
 
 function removetags {
 		sed -i 's/<[^>]*>//g' $PAGE
+}
+
+function removedoublequotes {
+		sed -i 's/\"//g' $PAGE
 }
 
 function changeversetag {
@@ -53,25 +77,14 @@ function addheadbrace {
 }
 
 function addtailbrace {
-		sed -i '$s/: "$/\n}/' $PAGE
+		sed -i '$s/$/\n}/' $PAGE
 }
 
 for argument in "$@"
 do
 case $argument in
 	makejson)
-		download
-		removehead
-		removetail
-		removelines
-		removetags
-		changeversetag
-		addquotes
-		paireverytwolines
-		addcolon
-		addcomma
-		addheadbrace
-		addtailbrace
+		mkjson
 	;;
 	becomeinitialcommit)
 		rm -rf .git
