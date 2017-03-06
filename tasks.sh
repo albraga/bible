@@ -2,7 +2,7 @@
 
 BOOK=$2
 CHAPTER=$3
-PAGE="matthew_henry_"$BOOK"_"$CHAPTER".html"
+PAGE="matthew_henry_"$BOOK"_"$CHAPTER".json"
 URL="http://www.sacred-texts.com/bib/cmt/mhcc/"$BOOK"00"$CHAPTER".htm"
 
 function download {
@@ -32,16 +32,46 @@ function changeversetag {
 		 sed -i 's/ \([0-9]\):\(-\?[0-9]\)/\_\1\_\2/g' $PAGE
 }
 
+function addquotes {
+	sed -i "s/\(.*\)/\"\1\"/" $PAGE
+}
+
+function paireverytwolines {
+	sed -i '$!N;s/\n/ /' $PAGE
+}
+
+function addcolon {
+		sed -i 's/" "/": "/g' $PAGE
+}
+
+function addcomma {
+	sed -i '$!s/$/,/' $PAGE
+}
+
+function addheadbrace {
+		sed -i '1s/^/{\n/' $PAGE
+}
+
+function addtailbrace {
+		sed -i '$s/: "$/\n}/' $PAGE
+}
+
 for argument in "$@"
 do
 case $argument in
-	process)
+	makejson)
 		download
 		removehead
 		removetail
 		removelines
 		removetags
 		changeversetag
+		addquotes
+		paireverytwolines
+		addcolon
+		addcomma
+		addheadbrace
+		addtailbrace
 	;;
 	becomeinitialcommit)
 		rm -rf .git
