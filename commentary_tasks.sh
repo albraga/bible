@@ -3,7 +3,7 @@
 BOOK=$2
 CHAPTERS=$3
 
-function mkjson {
+function batchjson {
   for (( i=1; i<=$CHAPTERS; i++ ))
 	do
 		CHAPTER=$i
@@ -84,7 +84,7 @@ for argument in "$@"
 do
 case $argument in
 	makejson)
-		mkjson
+		batchjson
 	;;
 	becomeinitialcommit)
 		rm -rf .git
